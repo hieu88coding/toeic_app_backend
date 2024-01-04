@@ -2,23 +2,32 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
     async up(queryInterface, Sequelize) {
-        await queryInterface.createTable('Readings', {
+        await queryInterface.createTable('MockResults', {
             id: {
                 allowNull: false,
                 autoIncrement: true,
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            level: {
+            userId: {
                 type: Sequelize.INTEGER
             },
             testName: {
                 type: Sequelize.STRING
             },
+            score: {
+                type: Sequelize.INTEGER
+            },
+            correctCount: {
+                type: Sequelize.INTEGER
+            },
+            wrongCount: {
+                type: Sequelize.INTEGER
+            },
             pdf: {
                 type: Sequelize.STRING
             },
-            images: {
+            userAnswer: {
                 type: Sequelize.STRING
             },
             correctAnswer: {
@@ -35,6 +44,6 @@ module.exports = {
         });
     },
     async down(queryInterface, Sequelize) {
-        await queryInterface.dropTable('Readings');
+        await queryInterface.dropTable('MockResults');
     }
 };

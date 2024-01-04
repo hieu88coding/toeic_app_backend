@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   MockTest.init({
     testName: DataTypes.STRING,
+    pdf: DataTypes.STRING,
     images: DataTypes.STRING,
     audiomp3: DataTypes.STRING,
     correctAnswer: DataTypes.STRING

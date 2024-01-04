@@ -6,10 +6,12 @@ const axios = require('axios');
 
 async function handlePdf(pdfPath, testName) {
     const serviceAccount = require('./config/serviceAccountKey.json');
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount),
-        storageBucket: 'hieu88toeicapp.appspot.com'
-    });
+    if (!admin.apps.length) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount),
+            storageBucket: 'hieu88toeicapp.appspot.com'
+        });
+    }
 
     const bucket = admin.storage().bucket();
     const folderPath = `${testName}`;

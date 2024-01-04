@@ -9,14 +9,13 @@ router.post('/', async (req, res) => {
     try {
         const data = req.body.data;
         const images = data.find(obj => obj.dataType === 'pdf').fileUrl;
-        const audio = data.find(obj => obj.dataType === 'mp3').fileUrl;
         const answer = data.find(obj => obj.dataType === 'json').fileUrl;
         const folderUrl = await handlePdf(images, req.body.testName);
-        const test = await db.MockTest.create({
+        const test = await db.Reading.create({
+            level: req.body.level,
             testName: req.body.testName,
             pdf: images,
             images: folderUrl,
-            audiomp3: audio,
             correctAnswer: answer,
         });
         if (folderUrl) {
@@ -32,69 +31,71 @@ router.post('/', async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to create MockTest.' });
+        res.status(500).json({ message: 'Failed to create Reading.' });
     }
 
 });
 
-// Get all MockTests
+// Get all Readings
 router.get('/', async (req, res) => {
     try {
-        const MockTests = await db.MockTest.findAll();
-        res.json(MockTests);
+        const Readings = await db.Reading.findAll();
+        res.json(Readings);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch MockTests.' });
+        res.status(500).json({ message: 'Failed to fetch Readings.' });
     }
 });
 
-// Get MockTest by ID
-router.get('/:id', async (req, res) => {
+// Get Reading by ID
+router.get('/:id/:level', async (req, res) => {
     try {
         console.log(req.params.id);
-        const mockTest = await db.MockTest.findOne({
+        const Reading = await db.Reading.findOne({
             where: {
-                testName: req.params.id
+                testName: req.params.id,
+                level: req.params.level
+
             }
         })
-        if (!mockTest) {
-            res.status(404).json({ message: 'MockTest not found.' });
+        if (!Reading) {
+            res.status(404).json({ message: 'Reading not found.' });
         } else {
-            res.json(mockTest);
+            res.json(Reading);
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to fetch MockTest.' });
+        res.status(500).json({ message: 'Failed to fetch Reading.' });
     }
 });
 
-// Update MockTest by ID
+// Update Reading by ID
 router.put('/:id', async (req, res) => {
     try {
-        const [updatedRowsCount] = await db.MockTest.update(req.body, {
+        const [updatedRowsCount] = await db.Reading.update(req.body, {
             where: { id: req.params.id }
         });
         if (updatedRowsCount === 0) {
-            res.status(404).json({ message: 'MockTest not found.' });
+            res.status(404).json({ message: 'Reading not found.' });
         } else {
-            const MockTest = await MockTest.findByPk(req.params.id);
-            res.json(MockTest);
+            const Reading = await Reading.findByPk(req.params.id);
+            res.json(Reading);
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update MockTest.' });
+        res.status(500).json({ message: 'Failed to update Reading.' });
     }
 });
 
-// Delete MockTest by ID
+// Delete Reading by ID
 router.delete('/:id', async (req, res) => {
     try {
-        const deletedRowsCount = await db.MockTest.destroy({ where: { id: req.params.id } });
+        const deletedRowsCount = await db.Reading.destroy({ where: { id: req.params.id } });
         if (deletedRowsCount === 0) {
-            res.status(404).json({ message: 'MockTest not found.' });
+            res.status(404).json({ message: 'Reading not found.' });
         } else {
-            res.json({ message: 'MockTest deleted successfully.' });
+            res.json({ message: 'Reading deleted successfully.' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete MockTest.' });
+        res.status(500).json({ message: 'Failed to delete Reading.' });
     }
 });
 

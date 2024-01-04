@@ -12,6 +12,9 @@ module.exports = {
       testName: {
         type: Sequelize.STRING
       },
+      pdf: {
+        type: Sequelize.STRING
+      },
       images: {
         type: Sequelize.STRING
       },

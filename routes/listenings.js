@@ -12,7 +12,8 @@ router.post('/', async (req, res) => {
         const audio = data.find(obj => obj.dataType === 'mp3').fileUrl;
         const answer = data.find(obj => obj.dataType === 'json').fileUrl;
         const folderUrl = await handlePdf(images, req.body.testName);
-        const test = await db.MockTest.create({
+        const test = await db.Listening.create({
+            level: req.body.level,
             testName: req.body.testName,
             pdf: images,
             images: folderUrl,
@@ -32,69 +33,69 @@ router.post('/', async (req, res) => {
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to create MockTest.' });
+        res.status(500).json({ message: 'Failed to create Listening.' });
     }
 
 });
 
-// Get all MockTests
+// Get all Listenings
 router.get('/', async (req, res) => {
     try {
-        const MockTests = await db.MockTest.findAll();
-        res.json(MockTests);
+        const Listenings = await db.Listening.findAll();
+        res.json(Listenings);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch MockTests.' });
+        res.status(500).json({ message: 'Failed to fetch Listenings.' });
     }
 });
 
-// Get MockTest by ID
-router.get('/:id', async (req, res) => {
+// Get Listening by ID
+router.get('/:id/:level', async (req, res) => {
     try {
-        console.log(req.params.id);
-        const mockTest = await db.MockTest.findOne({
+        const Listening = await db.Listening.findOne({
             where: {
-                testName: req.params.id
+                testName: req.params.id,
+                level: req.params.level
             }
         })
-        if (!mockTest) {
-            res.status(404).json({ message: 'MockTest not found.' });
+        if (!Listening) {
+            res.status(404).json({ message: 'Listening not found.' });
         } else {
-            res.json(mockTest);
+            res.json(Listening);
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to fetch MockTest.' });
+        res.status(500).json({ message: 'Failed to fetch Listening.' });
     }
 });
 
-// Update MockTest by ID
+// Update Listening by ID
 router.put('/:id', async (req, res) => {
     try {
-        const [updatedRowsCount] = await db.MockTest.update(req.body, {
+        const [updatedRowsCount] = await db.Listening.update(req.body, {
             where: { id: req.params.id }
         });
         if (updatedRowsCount === 0) {
-            res.status(404).json({ message: 'MockTest not found.' });
+            res.status(404).json({ message: 'Listening not found.' });
         } else {
-            const MockTest = await MockTest.findByPk(req.params.id);
-            res.json(MockTest);
+            const Listening = await Listening.findByPk(req.params.id);
+            res.json(Listening);
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update MockTest.' });
+        res.status(500).json({ message: 'Failed to update Listening.' });
     }
 });
 
-// Delete MockTest by ID
+// Delete Listening by ID
 router.delete('/:id', async (req, res) => {
     try {
-        const deletedRowsCount = await db.MockTest.destroy({ where: { id: req.params.id } });
+        const deletedRowsCount = await db.Listening.destroy({ where: { id: req.params.id } });
         if (deletedRowsCount === 0) {
-            res.status(404).json({ message: 'MockTest not found.' });
+            res.status(404).json({ message: 'Listening not found.' });
         } else {
-            res.json({ message: 'MockTest deleted successfully.' });
+            res.json({ message: 'Listening deleted successfully.' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete MockTest.' });
+        res.status(500).json({ message: 'Failed to delete Listening.' });
     }
 });
 
