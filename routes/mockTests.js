@@ -2,34 +2,34 @@ const db = require('../models/index.js');
 const express = require('express');
 const router = express.Router();
 const handlePdf = require('../pdfImages');
+const unzipAndUploadToFirebase = require('../extractFile')
 
 
 // Create a new test
 router.post('/', async (req, res) => {
     try {
         const data = req.body.data;
-        const images = data.find(obj => obj.dataType === 'pdf').fileUrl;
+        const exel = data.find(obj => obj.dataType === 'exel').fileUrl;
+        const images = data.find(obj => obj.dataType === 'jpg').fileUrl;
         const audio = data.find(obj => obj.dataType === 'mp3').fileUrl;
         const answer = data.find(obj => obj.dataType === 'json').fileUrl;
-        const folderUrl = await handlePdf(images, req.body.testName);
+        const exelFolderUrl = await unzipAndUploadToFirebase(exel, 'exel', req.body.testName);
+        const audioFolderUrl = await unzipAndUploadToFirebase(audio, 'mp3', req.body.testName);
+        const imagesFolderUrl = await unzipAndUploadToFirebase(images, 'jpg', req.body.testName);
+
         const test = await db.MockTest.create({
             testName: req.body.testName,
-            pdf: images,
-            images: folderUrl,
-            audiomp3: audio,
+            pdf: exelFolderUrl,
+            images: imagesFolderUrl,
+            audiomp3: audioFolderUrl,
             correctAnswer: answer,
         });
-        if (folderUrl) {
-            res.json({
-                message: 'Cắt file thành công',
-                status: 200,
-            });
-        } else {
-            res.json({
-                message: 'Cắt file bị hỏng',
-                status: 400,
-            });
-        }
+
+        res.json({
+            message: 'Lưu đề vào DB thành công',
+            status: 200,
+
+        })
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to create MockTest.' });

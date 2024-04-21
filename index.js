@@ -8,6 +8,7 @@ const userRouter = require('./routes/users.js');
 const testRouter = require('./routes/mockTests.js')
 const listeningRouter = require('./routes/listenings.js')
 const readingRouter = require('./routes/readings.js')
+const vocabRouter = require('./routes/vocabs.js')
 
 
 
@@ -24,6 +25,7 @@ app.use('/listenings', listeningRouter)
 app.use('/readings', readingRouter)
 app.use('/mockTests', testRouter)
 app.use('/users', userRouter);
+app.use('/vocabularys', vocabRouter);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(docs));
 connectDB();
 
