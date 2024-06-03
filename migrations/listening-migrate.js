@@ -12,6 +12,9 @@ module.exports = {
       level: {
         type: Sequelize.INTEGER
       },
+      partName: {
+        type: Sequelize.STRING
+      },
       testName: {
         type: Sequelize.STRING
       },

@@ -1,20 +1,20 @@
 const db = require('../models/index.js');
 const express = require('express');
 const router = express.Router();
-
+const unzipAndUploadToFirebase = require('../extractPart')
 
 // Create a new test
 router.post('/', async (req, res) => {
     try {
-        const data = req.body;
+        const data = req.body.data;
+        const exel = (data.find(obj => obj.dataType === 'exel') !== undefined) ? data.find(obj => obj.dataType === 'exel').fileUrl : 0;
+        const images = (data.find(obj => obj.dataType === 'jpg') !== undefined) ? data.find(obj => obj.dataType === 'jpg').fileUrl : 0;
+        const imagesFolderUrl = (images !== 0) ? await unzipAndUploadToFirebase('Vocabularys', images, 'jpg', req.body.testName, 'Ảnh') : 'null';
+        const exelFolderUrl = (exel !== 0) ? exel : 'null';
         const test = await db.Vocabulary.create({
-            topicName: data.testName,
-            number: data.number,
-            word: data.word,
-            type: data.type,
-            transcribe: data.transcribe,
-            image: data.image,
-            meaning: data.meaning,
+            topicName: req.body.testName,
+            exel: (exel !== 0) ? exelFolderUrl : 'null',
+            image: (images !== 0) ? imagesFolderUrl : 'null',
         });
 
         res.json({
@@ -32,12 +32,8 @@ router.post('/', async (req, res) => {
 // Get all Vocabularys
 router.get('/', async (req, res) => {
     try {
-        const distinctTopicNames = await db.Vocabulary.findAll({
-            attributes: ['topicName'], // Chỉ lấy trường testName
-            group: ['topicName'], // Nhóm các bản ghi theo trường testName
-        });
+        const topicNames = await db.Vocabulary.findAll();
 
-        const topicNames = distinctTopicNames.map((vocabulary) => vocabulary.topicName);
         res.json(topicNames);
     } catch (error) {
         res.status(500).json({ message: 'Failed to fetch Vocabularys.' });

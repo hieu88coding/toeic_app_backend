@@ -9,16 +9,10 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            level: {
-                type: Sequelize.INTEGER
-            },
-            number: {
-                type: Sequelize.INTEGER
-            },
-            content: {
+            testName: {
                 type: Sequelize.STRING
             },
-            images: {
+            pdf: {
                 type: Sequelize.STRING
             },
             correctAnswer: {

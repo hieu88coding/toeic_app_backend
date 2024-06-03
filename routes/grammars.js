@@ -14,10 +14,8 @@ router.post('/', async (req, res) => {
         const exel = (data.find(obj => obj.dataType === 'exel') !== undefined) ? data.find(obj => obj.dataType === 'exel').fileUrl : 0;
         const answer = data.find(obj => obj.dataType === 'json').fileUrl;
         const exelFolderUrl = (exel !== 0) ? exel : 'null';
-        const test = await db.Reading.create({
+        const test = await db.Grammar.create({
             testName: req.body.testName,
-            partName: req.body.part,
-            level: req.body.level,
             pdf: (exel !== 0) ? exelFolderUrl : 'null',
             correctAnswer: answer,
         });
@@ -29,110 +27,110 @@ router.post('/', async (req, res) => {
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to create Reading.' });
+        res.status(500).json({ message: 'Failed to create Grammar.' });
     }
 
 });
 
-// Get all Readings
+// Get all Grammars
 router.get('/', async (req, res) => {
     try {
-        const Readings = await db.Reading.findAll();
-        res.json(Readings);
+        const Grammars = await db.Grammar.findAll();
+        res.json(Grammars);
     } catch (error) {
-        res.status(500).json({ message: 'Failed to fetch Readings.' });
+        res.status(500).json({ message: 'Failed to fetch Grammars.' });
     }
 });
 
 router.get('/:id', async (req, res) => {
     try {
         console.log(req.params.id);
-        const Reading = await db.Reading.findAll({
+        const Grammar = await db.Grammar.findAll({
             where: {
                 partName: req.params.id,
             }
         })
-        if (!Reading) {
-            res.status(404).json({ message: 'Reading not found.' });
+        if (!Grammar) {
+            res.status(404).json({ message: 'Grammar not found.' });
         } else {
-            res.json(Reading);
+            res.json(Grammar);
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to fetch Reading.' });
+        res.status(500).json({ message: 'Failed to fetch Grammar.' });
     }
 });
 
 router.get('/:levelStart/:levelEnd', async (req, res) => {
     try {
-        const Reading = await db.Reading.findAll({
+        const Grammar = await db.Grammar.findAll({
             where: {
                 level: {
                     [Op.between]: [req.params.levelStart, req.params.levelEnd]
                 }
             }
         })
-        if (!Reading) {
-            res.status(404).json({ message: 'Reading not found.' });
+        if (!Grammar) {
+            res.status(404).json({ message: 'Grammar not found.' });
         } else {
-            res.json(Reading);
+            res.json(Grammar);
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to fetch Reading.' });
+        res.status(500).json({ message: 'Failed to fetch Grammar.' });
     }
 });
 
-// Get Reading by ID
+// Get Grammar by ID
 router.get('/:id/:testName', async (req, res) => {
     try {
         console.log(req.params.id);
-        const Reading = await db.Reading.findOne({
+        const Grammar = await db.Grammar.findOne({
             where: {
                 testName: req.params.testName,
                 partName: req.params.id
 
             }
         })
-        if (!Reading) {
-            res.status(404).json({ message: 'Reading not found.' });
+        if (!Grammar) {
+            res.status(404).json({ message: 'Grammar not found.' });
         } else {
-            res.json(Reading);
+            res.json(Grammar);
         }
     } catch (error) {
         console.log(error);
-        res.status(500).json({ message: 'Failed to fetch Reading.' });
+        res.status(500).json({ message: 'Failed to fetch Grammar.' });
     }
 });
 
-// Update Reading by ID
+// Update Grammar by ID
 router.put('/:id', async (req, res) => {
     try {
-        const [updatedRowsCount] = await db.Reading.update(req.body, {
+        const [updatedRowsCount] = await db.Grammar.update(req.body, {
             where: { id: req.params.id }
         });
         if (updatedRowsCount === 0) {
-            res.status(404).json({ message: 'Reading not found.' });
+            res.status(404).json({ message: 'Grammar not found.' });
         } else {
-            const Reading = await Reading.findByPk(req.params.id);
-            res.json(Reading);
+            const Grammar = await Grammar.findByPk(req.params.id);
+            res.json(Grammar);
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to update Reading.' });
+        res.status(500).json({ message: 'Failed to update Grammar.' });
     }
 });
 
-// Delete Reading by ID
+// Delete Grammar by ID
 router.delete('/:id', async (req, res) => {
     try {
-        const deletedRowsCount = await db.Reading.destroy({ where: { id: req.params.id } });
+        const deletedRowsCount = await db.Grammar.destroy({ where: { id: req.params.id } });
         if (deletedRowsCount === 0) {
-            res.status(404).json({ message: 'Reading not found.' });
+            res.status(404).json({ message: 'Grammar not found.' });
         } else {
-            res.json({ message: 'Reading deleted successfully.' });
+            res.json({ message: 'Grammar deleted successfully.' });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Failed to delete Reading.' });
+        res.status(500).json({ message: 'Failed to delete Grammar.' });
     }
 });
 

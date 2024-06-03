@@ -5,31 +5,7 @@ const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
 
-// Đường dẫn đến thư mục chứa ảnh và audio
-const imageFolderPath = 'D:/ToeicApp/images/Test1';
-const audioFolderPath = 'D:/ToeicApp/audio/Test1';
-
-// Tạo thư mục nếu chưa tồn tại
-fs.mkdirSync(imageFolderPath, { recursive: true });
-fs.mkdirSync(audioFolderPath, { recursive: true });
-
-// Hàm tải xuống và lưu ảnh
-async function downloadAndSaveImage(url, filename) {
-    try {
-        const response = await axios.get(url, { responseType: 'arraybuffer' });
-        const imageData = response.data;
-
-        const filePath = path.join(imageFolderPath, filename);
-        fs.writeFileSync(filePath, imageData);
-
-        console.log(`Đã tải xuống và lưu ảnh thành công: ${filePath}`);
-    } catch (error) {
-        console.error('Lỗi khi tải xuống ảnh:', error.message);
-    }
-}
-
-// Hàm tải xuống và lưu audio
-async function downloadAndSaveAudio(url, filename) {
+async function downloadAndSaveAudio(url, filename, audioFolderPath) {
     try {
         const response = await axios.get(url, { responseType: 'arraybuffer' });
         const audioData = response.data;
@@ -43,43 +19,32 @@ async function downloadAndSaveAudio(url, filename) {
     }
 }
 
+// Hàm tải xuống và lưu ảnh
+async function downloadAndSaveImage(url, filename, imageFolderPath) {
+    try {
+        const response = await axios.get(url, { responseType: 'arraybuffer' });
+        const imageData = response.data;
 
-// Add stealth plugin and use defaults (all tricks to hide puppeteer usage)
-const StealthPlugin = require('puppeteer-extra-plugin-stealth')
-puppeteer.use(StealthPlugin())
+        const filePath = path.join(imageFolderPath, filename);
+        fs.writeFileSync(filePath, imageData);
 
-// Add adblocker plugin to block all ads and trackers (saves bandwidth)
-const AdblockerPlugin = require('puppeteer-extra-plugin-adblocker')
-puppeteer.use(AdblockerPlugin({ blockTrackers: true }))
-
-// That's it, the rest is puppeteer usage as normal 😊
-puppeteer.launch({ headless: true }).then(async browser => {
-    const page = await browser.newPage()
-    const navigationPromise = page.waitForNavigation()
-
-    await page.goto('https://estudyme.com/study/test/toeic-testpro/test-1-62b69492bbc57b27fe10f7ac/')
-    await page.waitForSelector('.game-buttons.single-button button')
-    await page.click('.game-buttons.single-button button');
-    await navigationPromise
-    const audioSrcs = await page.$$eval('audio', audios => audios.map(audio => audio.src));
-    const imageSrcs = await page.$$eval('.game-image-widget-backdrop-preview img', images => images.map(img => img.src));
-    const rowCount = Math.max(audioSrcs.length, imageSrcs.length);
-    for (let i = 0; i < rowCount; i++) {
-        const imageSrc = imageSrcs[i];
-        const audioSrc = audioSrcs[i];
-
-        if (imageSrc) {
-            const imageName = `test1_img_${i + 1}.jpg`;
-            downloadAndSaveImage(imageSrc, imageName);
-        }
-
-        if (audioSrc) {
-            const audioName = `test1_audio_${i + 1}.mp3`;
-            downloadAndSaveAudio(audioSrc, audioName);
-        }
+        console.log(`Đã tải xuống và lưu ảnh thành công: ${filePath}`);
+    } catch (error) {
+        console.error('Lỗi khi tải xuống ảnh:', error.message);
     }
+}
 
 
-    await browser.close();
+async function scrapePart1(i) {
+    let audioFolderPath = `D:/ToeicApp/audio/Test${i}`;
+    let imageFolderPath = `D:/ToeicApp/images/Test${i}`;
+    let imageSrcs = await page.$$eval('.game-image-widget-backdrop-preview img', images => images.map(img => img.src));;
+    let imageName = `test${i}_img_${i}.jpg`;
+    downloadAndSaveImage(imageSrcs, imageName, imageFolderPath);
+    let audioSrcs = await page.$$eval('audio', audios => audios.map(audio => audio.src));
+    let audioName = `test${i}_audio_${i}.mp3`;
+    await downloadAndSaveAudio(audioSrcs[0], audioName, audioFolderPath);
+}
+module.exports = scrapePart1;
 
-})
+

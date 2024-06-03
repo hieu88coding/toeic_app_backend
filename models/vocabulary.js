@@ -15,12 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Vocabulary.init({
     topicName: DataTypes.STRING,
-    number: DataTypes.INTEGER,
-    word: DataTypes.STRING,
-    type: DataTypes.STRING,
-    transcribe: DataTypes.STRING,
-    image: DataTypes.STRING,
-    meaning: DataTypes.STRING,
+    exel: DataTypes.STRING,
     image: DataTypes.STRING,
   }, {
     sequelize,

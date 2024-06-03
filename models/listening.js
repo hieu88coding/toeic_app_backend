@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
   }
   Listening.init({
     level: DataTypes.INTEGER,
+    partName: DataTypes.STRING,
     testName: DataTypes.STRING,
     pdf: DataTypes.STRING,
     images: DataTypes.STRING,

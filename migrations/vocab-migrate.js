@@ -12,22 +12,7 @@ module.exports = {
       topicName: {
         type: Sequelize.STRING
       },
-      number: {
-        type: Sequelize.INTEGER
-      },
-      word: {
-        type: Sequelize.STRING
-      },
-      type: {
-        type: Sequelize.STRING
-      },
-      transcribe: {
-        type: Sequelize.STRING
-      },
-      image: {
-        type: Sequelize.STRING
-      },
-      meaning: {
+      exel: {
         type: Sequelize.STRING
       },
       image: {

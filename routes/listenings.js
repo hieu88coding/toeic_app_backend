@@ -2,35 +2,35 @@ const db = require('../models/index.js');
 const express = require('express');
 const router = express.Router();
 const handlePdf = require('../pdfImages');
-
+const unzipAndUploadToFirebase = require('../extractPart')
+const { Op } = require('sequelize');
 
 // Create a new test
 router.post('/', async (req, res) => {
     try {
         const data = req.body.data;
-        const images = data.find(obj => obj.dataType === 'pdf').fileUrl;
+        const exel = (data.find(obj => obj.dataType === 'exel') !== undefined) ? data.find(obj => obj.dataType === 'exel').fileUrl : 0;
+        const images = (data.find(obj => obj.dataType === 'jpg') !== undefined) ? data.find(obj => obj.dataType === 'jpg').fileUrl : 0;
         const audio = data.find(obj => obj.dataType === 'mp3').fileUrl;
         const answer = data.find(obj => obj.dataType === 'json').fileUrl;
-        const folderUrl = await handlePdf(images, req.body.testName);
+        const exelFolderUrl = (exel !== 0) ? exel : 'null';
+        const audioFolderUrl = await unzipAndUploadToFirebase('Listenings', audio, 'mp3', req.body.testName, req.body.part);
+        const imagesFolderUrl = (images !== 0) ? await unzipAndUploadToFirebase('Listenings', images, 'jpg', req.body.testName, req.body.part) : 'null';
         const test = await db.Listening.create({
-            level: req.body.level,
             testName: req.body.testName,
-            pdf: images,
-            images: folderUrl,
-            audiomp3: audio,
+            partName: req.body.part,
+            level: req.body.level,
+            pdf: (exel !== 0) ? exelFolderUrl : 'null',
+            images: (images !== 0) ? imagesFolderUrl : 'null',
+            audiomp3: audioFolderUrl,
             correctAnswer: answer,
         });
-        if (folderUrl) {
-            res.json({
-                message: 'Cắt file thành công',
-                status: 200,
-            });
-        } else {
-            res.json({
-                message: 'Cắt file bị hỏng',
-                status: 400,
-            });
-        }
+
+        res.json({
+            message: 'Lưu đề vào DB thành công',
+            status: 200,
+
+        })
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: 'Failed to create Listening.' });
@@ -48,13 +48,54 @@ router.get('/', async (req, res) => {
     }
 });
 
+router.get('/:id', async (req, res) => {
+    try {
+        console.log(req.params.id);
+        const Listening = await db.Listening.findAll({
+            where: {
+                partName: req.params.id,
+            }
+        })
+        if (!Listening) {
+            res.status(404).json({ message: 'Listening not found.' });
+        } else {
+            res.json(Listening);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Failed to fetch Listening.' });
+    }
+});
+
+router.get('/:levelStart/:levelEnd', async (req, res) => {
+    try {
+        const Listening = await db.Listening.findAll(
+            {
+                where: {
+                    level: {
+                        [Op.between]: [req.params.levelStart, req.params.levelEnd]
+                    }
+                }
+            }
+        )
+        if (!Listening) {
+            res.status(404).json({ message: 'Listening not found.' });
+        } else {
+            res.json(Listening);
+        }
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ message: 'Failed to fetch Listening.' });
+    }
+});
+
 // Get Listening by ID
-router.get('/:id/:level', async (req, res) => {
+router.get('/:id/:testName', async (req, res) => {
     try {
         const Listening = await db.Listening.findOne({
             where: {
-                testName: req.params.id,
-                level: req.params.level
+                testName: req.params.testName,
+                partName: req.params.id
             }
         })
         if (!Listening) {

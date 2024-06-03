@@ -14,10 +14,8 @@ module.exports = (sequelize, DataTypes) => {
         }
     }
     Grammar.init({
-        level: DataTypes.INTEGER,
-        number: DataTypes.INTEGER,
-        content: DataTypes.STRING,
-        images: DataTypes.STRING,
+        testName: DataTypes.STRING,
+        pdf: DataTypes.STRING,
         correctAnswer: DataTypes.STRING
     }, {
         sequelize,

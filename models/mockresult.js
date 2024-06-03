@@ -16,12 +16,8 @@ module.exports = (sequelize, DataTypes) => {
     MockResult.init({
         userId: DataTypes.INTEGER,
         testName: DataTypes.STRING,
-        score: DataTypes.INTEGER,
-        correctCount: DataTypes.INTEGER,
-        wrongCount: DataTypes.INTEGER,
-        pdf: DataTypes.STRING,
         userAnswer: DataTypes.STRING,
-        correctAnswer: DataTypes.STRING
+        score: DataTypes.INTEGER
     }, {
         sequelize,
         modelName: 'MockResult',
