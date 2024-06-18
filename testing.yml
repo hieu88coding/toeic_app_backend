@@ -1,0 +1,21 @@
+config:
+  target: 'http://localhost:8080' #địa chỉ muốn test
+  phases:  
+    - duration: 5  #kéo dài trong 60s
+      arrivalRate: 20 #trung bình 20 user/giây
+      name: "Testing with 10 users"  
+  defaults:
+    headers:
+      x-my-service-auth: '987401838271002188298567'
+scenarios: #lên kịch bản cho cho từng user
+  - flow:
+    - get:
+        url: "/mockTests"
+    - post:
+        url: "/results"
+        json:
+          userId: 999
+          testName: "Test 1"
+          partName: "Part 1"
+          userAnswer: "Answer 1"
+          score: 80

@@ -16,6 +16,7 @@ const speechRouter = require('./routes/speech-to-text.js')
 const speakingRouter = require('./routes/speakings.js')
 const writtingRouter = require('./routes/writtings.js')
 const grammarRouter = require('./routes/grammars.js')
+const blogRouter = require('./routes/blogs.js')
 const { configGoogle } = require('./controller/googleController.js')
 const { configFacebook } = require('./controller/facebookController.js')
 
@@ -53,6 +54,7 @@ app.use('/transcribe', speechRouter);
 app.use('/speakings', speakingRouter)
 app.use('/writtings', writtingRouter)
 app.use('/grammars', grammarRouter)
+app.use('/blogs', blogRouter)
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(docs));
 connectDB();
 configPassport();
