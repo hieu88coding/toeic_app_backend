@@ -2,8 +2,11 @@ const db = require('../models/index.js');
 const express = require('express');
 const partresult = require('../models/partresult.js');
 const router = express.Router();
-const { sequelize, Sequelize } = require('sequelize');
+const { sequelize, Sequelize, Op } = require('sequelize');
 const partNamesArray = ['part1', 'part2', 'part3', 'part4', 'part5', 'part6', 'part71', 'part72', 'part73'];
+const lisArray = ['part1', 'part2', 'part3', 'part4'];
+const reaArray = ['part5', 'part6', 'part71', 'part72', 'part73'];
+
 const dotenv = require('dotenv');
 dotenv.config()
 const jwt = require('jsonwebtoken');
@@ -25,6 +28,302 @@ const authenticateToken = (req, res, next) => {
         next();
     });
 };
+router.get('/count/:type', async (req, res) => {
+    try {
+        let result = [];
+        if (req.params.type === 'Listenings') {
+            result = await db.PartResult.findOne({
+                attributes: [
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score > 495 THEN 1 END')), 'highScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score >= 200 AND score <= 495 THEN 1 END')), 'averageScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score < 200 THEN 1 END')), 'lowScoreCount']
+                ],
+
+                where: {
+                    partName: {
+                        [Op.in]: lisArray
+                    }
+                },
+                raw: true
+            });
+        } else if (req.params.type === 'Readings') {
+            result = await db.PartResult.findOne({
+                attributes: [
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score > 495 THEN 1 END')), 'highScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score >= 200 AND score <= 495 THEN 1 END')), 'averageScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score < 200 THEN 1 END')), 'lowScoreCount']
+                ],
+                where: {
+                    partName: {
+                        [Op.in]: reaArray
+                    }
+                },
+                raw: true
+            });
+        } else {
+            result = await db.MockResult.findOne({
+                attributes: [
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score > 800 THEN 1 END')), 'highScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score >= 500 AND score <= 800 THEN 1 END')), 'averageScoreCount'],
+                    [Sequelize.fn('COUNT', Sequelize.literal('CASE WHEN score < 500 THEN 1 END')), 'lowScoreCount']
+                ],
+                where: {},
+                raw: true
+            });
+        }
+
+
+        const { highScoreCount, averageScoreCount, lowScoreCount, } = result;
+
+        res.json({ highScoreCount, averageScoreCount, lowScoreCount });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to fetch statistics.' });
+    }
+});
+router.get('/stats/:type', async (req, res) => {
+    try {
+        let maxScoreResult = null;
+        let minScoreResult = null;
+        let maxScoreUser = null;
+        let minScoreUser = null;
+        let averageScoreResult = null
+        if (req.params.type === 'Listenings') {
+            averageScoreResult = await db.PartResult.findOne({
+                attributes: [
+                    [Sequelize.fn('AVG', Sequelize.col('score')), 'avgScore']
+                ],
+                where: {
+                    partName: {
+                        [Op.in]: lisArray
+                    }
+                },
+                raw: true
+            });
+            maxScoreResult = await db.PartResult.findOne({
+                attributes: ['userId', 'score'],
+                where: {
+                    partName: {
+                        [Op.in]: lisArray
+                    }
+                },
+                order: [[Sequelize.col('score'), 'DESC']],
+                raw: true
+            });
+
+            // Tìm bản ghi có điểm thấp nhất
+            minScoreResult = await db.PartResult.findOne({
+                attributes: ['userId', 'score'],
+                where: {
+                    partName: {
+                        [Op.in]: lisArray
+                    }
+                },
+                order: [[Sequelize.col('score'), 'ASC']],
+                raw: true
+            });
+
+            // Lấy thông tin User cho điểm cao nhất
+
+            if (maxScoreResult) {
+                maxScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: maxScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+            // Lấy thông tin User cho điểm thấp nhất
+            if (minScoreResult) {
+                minScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: minScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+        } else if (req.params.type === 'Readings') {
+            averageScoreResult = await db.PartResult.findOne({
+                attributes: [
+                    [Sequelize.fn('AVG', Sequelize.col('score')), 'avgScore']
+                ],
+                where: {
+                    partName: {
+                        [Op.in]: reaArray
+                    }
+                },
+                raw: true
+            });
+            maxScoreResult = await db.PartResult.findOne({
+                attributes: ['userId', 'score'],
+                where: {
+                    partName: {
+                        [Op.in]: reaArray
+                    }
+                },
+                order: [[Sequelize.col('score'), 'DESC']],
+                raw: true
+            });
+
+            // Tìm bản ghi có điểm thấp nhất
+            minScoreResult = await db.PartResult.findOne({
+                attributes: ['userId', 'score'],
+                where: {
+                    partName: {
+                        [Op.in]: reaArray
+                    }
+                },
+                order: [[Sequelize.col('score'), 'ASC']],
+                raw: true
+            });
+
+            // Lấy thông tin User cho điểm cao nhất
+
+            if (maxScoreResult) {
+                maxScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: maxScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+            // Lấy thông tin User cho điểm thấp nhất
+            if (minScoreResult) {
+                minScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: minScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+        } else {
+            averageScoreResult = await db.MockResult.findOne({
+                attributes: [
+                    [Sequelize.fn('AVG', Sequelize.col('score')), 'avgScore']
+                ],
+                raw: true
+            });
+            maxScoreResult = await db.MockResult.findOne({
+                attributes: ['userId', 'score'],
+                order: [[Sequelize.col('score'), 'DESC']],
+                raw: true
+            });
+
+            // Tìm bản ghi có điểm thấp nhất
+            minScoreResult = await db.MockResult.findOne({
+                attributes: ['userId', 'score'],
+                order: [[Sequelize.col('score'), 'ASC']],
+                raw: true
+            });
+
+            // Lấy thông tin User cho điểm cao nhất
+
+            if (maxScoreResult) {
+                maxScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: maxScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+            // Lấy thông tin User cho điểm thấp nhất
+            if (minScoreResult) {
+                minScoreUser = await db.User.findOne({
+                    attributes: ['firstName', 'lastName'],
+                    where: {
+                        id: minScoreResult.userId
+                    },
+                    raw: true
+                });
+            }
+
+        }
+
+
+        const result = {
+            maxScore: {
+                score: maxScoreResult ? maxScoreResult.score : null,
+                user: maxScoreUser
+            },
+            minScore: {
+                score: minScoreResult ? minScoreResult.score : null,
+                user: minScoreUser
+            },
+            avgScore: averageScoreResult
+        };
+        res.json(result);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to fetch statistics.' });
+    }
+});
+
+router.get('/user/:type', async (req, res) => {
+    try {
+        const currentYear = new Date().getFullYear();
+        let startMonth, endMonth;
+
+        if (req.params.type === 'first') {
+            // 6 tháng đầu năm
+            startMonth = 0; // Tháng 1 (tháng 0 theo JS)
+            endMonth = 5; // Tháng 6 (tháng 5 theo JS)
+        } else if (req.params.type === 'last') {
+            // 6 tháng cuối năm
+            startMonth = 6; // Tháng 7 (tháng 6 theo JS)
+            endMonth = 11; // Tháng 12 (tháng 11 theo JS)
+        } else {
+            return res.status(400).json({ message: 'Invalid period parameter. Use "first" or "last".' });
+        }
+
+        const results = await db.User.findAll({
+            attributes: [
+                [Sequelize.fn('MONTH', Sequelize.col('createdAt')), 'month'],
+                [Sequelize.fn('COUNT', Sequelize.col('id')), 'userCount']
+            ],
+            where: {
+                createdAt: {
+                    [Op.between]: [
+                        new Date(currentYear, startMonth, 1),
+                        new Date(currentYear, endMonth + 1, 0, 23, 59, 59) // ngày cuối của tháng endMonth
+                    ]
+                }
+            },
+            group: [Sequelize.fn('MONTH', Sequelize.col('createdAt'))],
+            order: [[Sequelize.fn('MONTH', Sequelize.col('createdAt')), 'ASC']],
+            raw: true
+        });
+
+        // Khởi tạo mảng kết quả cho tất cả các tháng với giá trị mặc định là 0
+        const monthCount = (endMonth - startMonth) + 1;
+        const monthlyResults = Array.from({ length: monthCount }, (_, i) => ({
+            month: startMonth + i + 1, // Tháng bắt đầu từ 1 (tháng 1)
+            userCount: 0
+        }));
+
+        // Cập nhật mảng kết quả với dữ liệu thực tế từ truy vấn
+        results.forEach(result => {
+            const monthIndex = result.month - startMonth - 1;
+            if (monthIndex >= 0 && monthIndex < monthCount) {
+                monthlyResults[monthIndex].userCount = parseInt(result.userCount, 10);
+            }
+        });
+
+        res.json(monthlyResults);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to fetch results.' });
+    }
+});
 // Create a new test
 router.post('/', async (req, res) => {
     try {

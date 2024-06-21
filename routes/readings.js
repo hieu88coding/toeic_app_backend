@@ -5,6 +5,16 @@ const handlePdf = require('../pdfImages');
 const unzipAndUploadToFirebase = require('../extractPart')
 const { Op } = require('sequelize');
 
+router.get('/count', async (req, res) => {
+    try {
+        const count = await db.Reading.count();
+        res.json({ count });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Failed to fetch count.' });
+    }
+});
+
 // Create a new test
 router.post('/', async (req, res) => {
     try {
