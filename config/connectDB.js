@@ -1,8 +1,9 @@
 const Sequelize = require("sequelize");
-
+const dotenv = require('dotenv')
+dotenv.config()
 // Option 3: Passing parameters separately (other dialects)
 const sequelize = new Sequelize('toeic_app', 'root', null, {
-    host: 'localhost',
+    host: process.env.DB_HOST,
     dialect: 'mysql',
     logging: false //de k hien query moi khi reload trang
 });
