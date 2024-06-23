@@ -15,7 +15,7 @@ router.get(
         console.log(req.user);
         const user = req.user;
         const token = jwt.sign(user, process.env.JWT_SECRET);
-        res.cookie('x-auth-token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, domain: '.netlify.app', sameSite: 'none' });
+        res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: '.netlify.app', sameSite: 'none' });
         //res.redirect(`http://localhost:5173/`);
         res.render('social.ejs', { ssoToken: token })
     }
@@ -30,7 +30,7 @@ router.get(
         console.log(req.user);
         const user = req.user;
         const token = jwt.sign(user, process.env.JWT_SECRET);
-        res.cookie('x-auth-token', token, { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, secure: true, domain: '.netlify.app', sameSite: 'none' });
+        res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: '.netlify.app', sameSite: 'none' });
         //res.redirect(`http://localhost:5173/`);
         res.render('social.ejs', { ssoToken: token })
     }
