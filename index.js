@@ -35,9 +35,13 @@ app.use(session({
     saveUninitialized: true
 }));
 
+// app.use(cors({
+//     credentials: true,
+//     origin: 'http://localhost:5173'
+// }));
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:5173'
+    origin: 'https://hieucao88toeic.netlify.app'
 }));
 app.use(cookieParser('secret'));
 app.use(bodyParser.json({ limit: '50mb' }));
