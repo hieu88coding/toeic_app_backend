@@ -4,8 +4,8 @@ const fs = require('fs');
 const path = require('path');
 const Sequelize = require('sequelize');
 const basename = path.basename(__filename);
-const env = process.env.NODE_ENV || 'development';// check môi trường
-//const env = process.env.NODE_ENV || 'production';// check môi trường
+//const env = process.env.NODE_ENV || 'development';// check môi trường
+const env = process.env.NODE_ENV || 'production';// check môi trường
 const config = require(__dirname + '/../config/config.json')[env];//check file config
 const db = {};
 
