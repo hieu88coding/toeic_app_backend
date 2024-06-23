@@ -41,7 +41,7 @@ app.use(session({
 // }));
 app.use(cors({
     credentials: true,
-    origin: 'https://hieucao88toeic.netlify.app'
+    origin: 'http://hieucao88toeic.netlify.app'
 }));
 app.use(cookieParser('secret'));
 app.use(bodyParser.json({ limit: '50mb' }));
