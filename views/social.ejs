@@ -13,7 +13,8 @@
         //const redirectURL = `${localStorage.getItem("clientURL")}/code?ssoToken=${ssoToken}`
         // const redirectURL = `http://localhost:5173/`
         // window.location.href = redirectURL;
-        const redirectURL = ` https://hieucao88toeic.netlify.app/`
+        //const redirectURL = ` https://hieucao88toeic.netlify.app/`
+        const redirectURL = `https://hieucao88toeic.netlify.app/auth-callback?token=${ssoToken}`;
         window.location.href = redirectURL;
     })
 </script>

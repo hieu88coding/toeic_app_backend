@@ -15,7 +15,7 @@ router.get(
         console.log(req.user);
         const user = req.user;
         const token = jwt.sign(user, process.env.JWT_SECRET);
-        res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: 'toeic-app-backend-j1c5.onrender.com', sameSite: 'none' });
+        //res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: 'toeic-app-backend-j1c5.onrender.com', sameSite: 'none' });
         //res.redirect(`http://localhost:5173/`);
         res.render('social.ejs', { ssoToken: token })
     }
@@ -30,7 +30,7 @@ router.get(
         console.log(req.user);
         const user = req.user;
         const token = jwt.sign(user, process.env.JWT_SECRET);
-        res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: 'toeic-app-backend-j1c5.onrender.com', sameSite: 'none' });
+        //res.cookie('x-auth-token', token, { httpOnly: false, secure: true, domain: 'toeic-app-backend-j1c5.onrender.com', sameSite: 'none' });
         //res.redirect(`http://localhost:5173/`);
         res.render('social.ejs', { ssoToken: token })
     }
